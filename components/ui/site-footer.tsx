@@ -64,6 +64,8 @@ const STYLES = `
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  overflow: visible;
+  display: block;
 }
 /* CTA button — matches site ShinyButton aesthetic */
 .footer-cta-btn {
@@ -241,7 +243,7 @@ export default function SiteFooter({ onEnrol }: { onEnrol?: () => void }) {
             <h2
               ref={headingRef}
               className="footer-text-glow"
-              style={{ fontSize: 'clamp(40px, 8vw, 96px)', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.05, textAlign: 'center', margin: 0 }}
+              style={{ fontSize: 'clamp(40px, 8vw, 96px)', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.15, textAlign: 'center', margin: 0, paddingBottom: '0.1em' }}
             >
               Ready to become<br />an elite agent?
             </h2>

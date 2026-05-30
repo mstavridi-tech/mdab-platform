@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /Users/stavridi/Desktop/mdab-platform/components)",
+      "Bash(npm run *)",
+      "Bash(echo \"Dev server PID: $!\")",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(cat /tmp/next-dev.log | grep -E \"\\(error|Error|warn|Warning\\)\" | head -20)",
+      "Read(//private/tmp/**)",
+      "WebFetch(domain:million-dollar-agent-blueprint.vercel.app)",
+      "Bash(curl -s \"https://million-dollar-agent-blueprint.vercel.app/million-dollar-agent-blueprint.html\" -o /tmp/prototype.html)",
+      "Read(//tmp/**)",
+      "Bash(curl -s \"http://localhost:3000\" -H \"Cache-Control: no-cache\" > /tmp/test.html && sleep 3 && tail -2 /Users/stavridi/Desktop/mdab-platform/.next/dev/logs/next-development.log)",
+      "Bash(curl -s \"http://localhost:3000/_next/image?url=%2Fta-logo.png&w=36&q=75\" -o /dev/null -w \"%{http_code}\")",
+      "Bash(curl -s \"http://localhost:3000/_next/image?url=%2Fta-home-screen.png&w=828&q=75\" -o /dev/null -w \"%{http_code}\")",
+      "Bash(curl -s \"http://localhost:3000/_next/image?url=%2Fta-logo.png&w=64&q=75\" -o /dev/null -w \"%{http_code}\")",
+      "Bash(npx next *)",
+      "Bash(wait)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(awk '{print $2}')",
+      "Bash(lsof -i :3000 -sTCP:LISTEN)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/ --max-time 5)",
+      "Bash(lsof -i :3001 -sTCP:LISTEN)",
+      "Bash(jobs)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/ --max-time 10)",
+      "Bash(lsof -i :3002 -sTCP:LISTEN)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/ --max-time 15)",
+      "Bash(pkill -f \"next\")",
+      "Bash(echo \"PID: $!\")",
+      "Bash(echo \"Started PID: $!\")",
+      "Bash(open \"/Users/stavridi/Desktop/mdab-platform/Tyron Ash Course/million-dollar-agent-blueprint.html\")",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)"
+    ],
+    "additionalDirectories": [
+      "/Users/stavridi/Desktop/mdab-platform",
+      "/tmp"
+    ]
+  }
+}

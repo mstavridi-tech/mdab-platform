@@ -19,7 +19,7 @@ const STACK_OFFSET = 10; // each card peeks this many px below the previous
 
 export default function CurriculumSection({ onEnrol }: { onEnrol?: () => void }) {
   return (
-    <section style={{
+    <section id="curriculum" style={{
       background: 'linear-gradient(180deg, #060608 0%, #1a1200 40%, #0e0900 100%)',
       borderTop: '1px solid rgba(201,168,76,0.08)',
       padding: 'clamp(60px, 10vw, 100px) 0 clamp(80px, 10vw, 120px)',

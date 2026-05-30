@@ -12,10 +12,24 @@ import AgentsSection from "@/components/ui/agents-section";
 import SiteFooter from "@/components/ui/site-footer";
 import ScrollText from "@/components/ui/scroll-text";
 import { PricingModal } from "@/components/ui/pricing-modal";
+import CheckoutModal, { Plan } from "@/components/ui/checkout-modal";
 
 export default function DemoOne() {
   const glowRef = useRef<HTMLDivElement>(null);
   const [pricingOpen, setPricingOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+
+  function handleSelectPlan(plan: Plan) {
+    setPricingOpen(false);
+    setSelectedPlan(plan);
+    setCheckoutOpen(true);
+  }
+
+  function handleBackToPricing() {
+    setCheckoutOpen(false);
+    setPricingOpen(true);
+  }
 
   // Mouse-following gold glow
   useEffect(() => {
@@ -115,7 +129,17 @@ export default function DemoOne() {
         }}
       />
 
-      <PricingModal isOpen={pricingOpen} onClose={() => setPricingOpen(false)} />
+      <PricingModal
+        isOpen={pricingOpen}
+        onClose={() => setPricingOpen(false)}
+        onSelectPlan={handleSelectPlan}
+      />
+      <CheckoutModal
+        isOpen={checkoutOpen}
+        plan={selectedPlan}
+        onClose={() => setCheckoutOpen(false)}
+        onBack={handleBackToPricing}
+      />
 
       {/* Hero */}
       <div style={{ height: '100vh', position: 'relative', zIndex: 2 }}>
@@ -128,7 +152,7 @@ export default function DemoOne() {
         <ScrollText />
         <FeaturesSection />
         <AgentsSection />
-        <HowItWorks />
+        <HowItWorks onEnrol={() => setPricingOpen(true)} />
         <CurriculumSection onEnrol={() => setPricingOpen(true)} />
         <AboutSection onEnrol={() => setPricingOpen(true)} />
         <TestimonialsSection />

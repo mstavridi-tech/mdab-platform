@@ -20,7 +20,7 @@ const STEPS = [
   },
 ];
 
-export default function HowItWorks() {
+export default function HowItWorks({ onEnrol }: { onEnrol?: () => void }) {
   return (
     <section style={{
       background: '#060608',
@@ -131,7 +131,7 @@ export default function HowItWorks() {
             No complicated onboarding. No hidden barriers. Just a clear path from where you are now to where you want to be — and a system that gets you there.
           </p>
 
-          <ShinyButton>Enrol Now — Join the Elite</ShinyButton>
+          <ShinyButton onClick={onEnrol}>Enrol Now — Join the Elite</ShinyButton>
         </div>
 
         {/* RIGHT — stacking cards */}

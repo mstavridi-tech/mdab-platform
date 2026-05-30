@@ -623,10 +623,10 @@ export default function MinimalHero({ onEnrol }: { onEnrol?: () => void }) {
           <img src="/ta-logo.png" alt="Tyron Ash International" className="logo" />
         </a>
         <nav className="nav">
-          <a href="#">Course</a>
-          <a href="#">About</a>
-          <a href="#">FAQ</a>
-          <a href="#">Contact</a>
+          <a href="#curriculum">Course</a>
+          <a href="#about">About</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contact">Contact</a>
         </nav>
         <div className="header-actions">
           <button className="btn-ghost" onClick={() => setLoginOpen(true)}>Log In</button>
@@ -666,7 +666,7 @@ export default function MinimalHero({ onEnrol }: { onEnrol?: () => void }) {
           <p className="subtitle">The exact system Tyron Ash used to build a<br/>9-figure international real estate empire.</p>
           <div className="hero-buttons">
             <ShinyButton onClick={onEnrol}>Enrol Now — Join the Elite</ShinyButton>
-            <button className="btn-secondary">See the Course</button>
+            <button className="btn-secondary" onClick={() => { document.getElementById('curriculum')?.scrollIntoView({ behavior: 'smooth' }); }}>See the Course</button>
           </div>
         </div>
       </main>

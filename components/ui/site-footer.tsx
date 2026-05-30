@@ -1,9 +1,10 @@
 "use client";
 import * as React from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
+import { LoginModal } from "@/components/ui/login-modal";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -179,13 +180,14 @@ const MarqueeItem = () => (
   </div>
 );
 
-const NAV = ['About', 'FAQ', 'Contact', 'Terms', 'Privacy', 'Member Login'];
+const NAV = ['About', 'FAQ', 'Contact', 'Terms', 'Privacy'];
 
 export default function SiteFooter({ onEnrol }: { onEnrol?: () => void }) {
   const wrapperRef  = useRef<HTMLDivElement>(null);
   const giantRef    = useRef<HTMLDivElement>(null);
   const headingRef  = useRef<HTMLHeadingElement>(null);
   const contentRef  = useRef<HTMLDivElement>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined" || !wrapperRef.current) return;
@@ -257,7 +259,18 @@ export default function SiteFooter({ onEnrol }: { onEnrol?: () => void }) {
                     <a href={`#${label.toLowerCase().replace(' ', '-')}`}>{label}</a>
                   </li>
                 ))}
+                <li>
+                  <button
+                    onClick={() => setLoginOpen(true)}
+                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit', fontSize: 13, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.04em', transition: 'color 200ms ease' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'rgba(201,168,76,0.85)'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'}
+                  >
+                    Member Login
+                  </button>
+                </li>
               </ul>
+              <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
             </div>
           </div>
 

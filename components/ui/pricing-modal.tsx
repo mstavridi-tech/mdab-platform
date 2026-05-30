@@ -6,6 +6,7 @@ import { X, ShieldCheck, Check } from 'lucide-react';
 interface PricingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSelectPlan?: (plan: 'community' | 'blueprint') => void;
 }
 
 const COMMUNITY = [
@@ -26,7 +27,7 @@ const BLUEPRINT = [
   'Lifetime access, including future updates',
 ];
 
-export function PricingModal({ isOpen, onClose }: PricingModalProps) {
+export function PricingModal({ isOpen, onClose, onSelectPlan }: PricingModalProps) {
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = '';
@@ -77,9 +78,6 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
               borderRadius: 18,
               width: '100%',
               maxWidth: 800,
-              /* never taller than viewport with some breathing room */
-              maxHeight: 'calc(100vh - 32px)',
-              overflowY: 'auto',
               padding: '28px 28px 24px',
               boxShadow: '0 32px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(201,168,76,0.06)',
             }}
@@ -176,7 +174,7 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
                   Community Plan
                 </p>
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, marginBottom: 3 }}>
-                  <span style={{ fontSize: 12, color: 'rgba(201,168,76,0.7)', fontWeight: 700, marginBottom: 5 }}>£</span>
+                  <span style={{ fontSize: 12, color: 'rgba(201,168,76,0.7)', fontWeight: 700, marginBottom: 5 }}>$</span>
                   <span style={{ fontSize: 'clamp(36px,5vw,48px)', fontWeight: 900, color: '#E2C472', letterSpacing: '-0.03em', lineHeight: 1 }}>67</span>
                   <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 6 }}>/month</span>
                 </div>
@@ -191,19 +189,17 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
                   ))}
                 </ul>
 
-                <a
-                  href="https://www.skool.com/tyronash"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => onSelectPlan?.('community')}
                   style={{
-                    display: 'block', textAlign: 'center',
+                    display: 'block', width: '100%', textAlign: 'center',
                     padding: '12px 20px',
                     border: '1px solid rgba(201,168,76,0.35)',
                     borderRadius: 9,
                     color: '#E2C472',
                     fontSize: 11, fontWeight: 800,
                     letterSpacing: '0.1em', textTransform: 'uppercase',
-                    textDecoration: 'none',
+                    cursor: 'pointer',
                     background: 'rgba(201,168,76,0.04)',
                     transition: 'background 180ms, border-color 180ms',
                   }}
@@ -211,7 +207,7 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(201,168,76,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,168,76,0.35)'; }}
                 >
                   Join Community
-                </a>
+                </button>
               </div>
 
               {/* BLUEPRINT */}
@@ -242,7 +238,7 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
                   Blueprint Plan
                 </p>
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, marginBottom: 3 }}>
-                  <span style={{ fontSize: 12, color: 'rgba(201,168,76,0.7)', fontWeight: 700, marginBottom: 5 }}>£</span>
+                  <span style={{ fontSize: 12, color: 'rgba(201,168,76,0.7)', fontWeight: 700, marginBottom: 5 }}>$</span>
                   <span style={{ fontSize: 'clamp(36px,5vw,48px)', fontWeight: 900, color: '#E2C472', letterSpacing: '-0.03em', lineHeight: 1 }}>1,800</span>
                 </div>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: '0 0 16px' }}>one-time payment · lifetime access</p>
@@ -256,18 +252,17 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
                   ))}
                 </ul>
 
-                <a
-                  href="https://www.skool.com/tyronash-blueprint"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => onSelectPlan?.('blueprint')}
                   style={{
-                    display: 'block', textAlign: 'center',
+                    display: 'block', width: '100%', textAlign: 'center',
                     padding: '12px 20px',
+                    border: 'none',
                     borderRadius: 9,
                     color: '#0a0800',
                     fontSize: 11, fontWeight: 800,
                     letterSpacing: '0.1em', textTransform: 'uppercase',
-                    textDecoration: 'none',
+                    cursor: 'pointer',
                     background: 'linear-gradient(135deg, #E2C472 0%, #C9A84C 100%)',
                     boxShadow: '0 4px 20px rgba(201,168,76,0.3)',
                     transition: 'box-shadow 180ms, transform 180ms',
@@ -276,7 +271,7 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(201,168,76,0.3)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
                 >
                   Get the Blueprint
-                </a>
+                </button>
               </div>
             </div>
 

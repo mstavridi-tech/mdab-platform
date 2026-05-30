@@ -105,6 +105,27 @@ const STYLES = `
   transition: color 200ms ease;
 }
 .footer-nav-links a:hover { color: rgba(201,168,76,0.85); }
+.footer-bottom-bar {
+  position: relative;
+  z-index: 20;
+  padding: clamp(16px,2vw,24px) clamp(20px,4vw,48px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(201,168,76,0.06);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+@media (max-width: 768px) {
+  .footer-bottom-bar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding-bottom: 20px;
+  }
+  .footer-bottom-bar p { font-size: 9px !important; letter-spacing: 0.08em !important; }
+}
 `;
 
 export type MagneticButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
@@ -160,7 +181,7 @@ const MarqueeItem = () => (
 
 const NAV = ['About', 'FAQ', 'Contact', 'Terms', 'Privacy', 'Member Login'];
 
-export default function SiteFooter() {
+export default function SiteFooter({ onEnrol }: { onEnrol?: () => void }) {
   const wrapperRef  = useRef<HTMLDivElement>(null);
   const giantRef    = useRef<HTMLDivElement>(null);
   const headingRef  = useRef<HTMLHeadingElement>(null);
@@ -225,7 +246,7 @@ export default function SiteFooter() {
 
             <div ref={contentRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
               {/* Single CTA button */}
-              <MagneticButton as="a" href="#enroll" className="footer-cta-btn">
+              <MagneticButton as="button" onClick={onEnrol} className="footer-cta-btn">
                 Enrol Now — Join the Elite
               </MagneticButton>
 
@@ -240,17 +261,12 @@ export default function SiteFooter() {
             </div>
           </div>
 
-          {/* Bottom bar */}
-          <div style={{ position: 'relative', zIndex: 20, padding: 'clamp(16px,2vw,24px) clamp(20px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid rgba(201,168,76,0.06)', flexWrap: 'wrap', gap: 12 }}>
-            <p style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', fontWeight: 600, margin: 0 }}>
-              © 2025 Tyron Ash International. All rights reserved.{' '}
-              <span style={{ color: 'rgba(255,255,255,0.18)' }}>·</span>{' '}
-              Designed &amp; built by <span style={{ color: 'rgba(201,168,76,0.55)' }}>Maria Stavridi</span>
-            </p>
-
-            {/* Back to top */}
+          {/* Bottom bar — back to top button + copyright stacked below BLUEPRINT text */}
+          <div className="footer-bottom-bar">
+            {/* Back to top — centred on mobile, left on desktop */}
             <MagneticButton
               as="button"
+              className="footer-back-top"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(201,168,76,0.2)', background: 'rgba(201,168,76,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', flexShrink: 0, transition: 'color 200ms ease, border-color 200ms ease' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(201,168,76,0.85)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,168,76,0.5)'; }}
@@ -260,6 +276,12 @@ export default function SiteFooter() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
               </svg>
             </MagneticButton>
+
+            <p style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', fontWeight: 500, margin: 0 }}>
+              © 2025 Tyron Ash International. All rights reserved.{' '}
+              <span style={{ color: 'rgba(255,255,255,0.12)' }}>·</span>{' '}
+              Designed &amp; built by <span style={{ color: 'rgba(201,168,76,0.4)' }}>Maria Stavridi</span>
+            </p>
           </div>
 
         </footer>

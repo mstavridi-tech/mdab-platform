@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MinimalHero from "@/components/ui/hero-minimalism";
 import CredibilitySection from "@/components/ui/credibility-section";
 import FeaturesSection from "@/components/ui/features-section";
@@ -11,9 +11,11 @@ import AffiliateSection from "@/components/ui/affiliate-section";
 import AgentsSection from "@/components/ui/agents-section";
 import SiteFooter from "@/components/ui/site-footer";
 import ScrollText from "@/components/ui/scroll-text";
+import { PricingModal } from "@/components/ui/pricing-modal";
 
 export default function DemoOne() {
   const glowRef = useRef<HTMLDivElement>(null);
+  const [pricingOpen, setPricingOpen] = useState(false);
 
   // Mouse-following gold glow
   useEffect(() => {
@@ -94,7 +96,7 @@ export default function DemoOne() {
   }, []);
 
   return (
-    <div style={{ background: '#060608', minHeight: '100vh', position: 'relative' }}>
+    <div style={{ background: '#060608', minHeight: '100vh', position: 'relative', overflowX: 'clip' }}>
 
       {/* Mouse-following gold glow */}
       <div
@@ -113,9 +115,11 @@ export default function DemoOne() {
         }}
       />
 
+      <PricingModal isOpen={pricingOpen} onClose={() => setPricingOpen(false)} />
+
       {/* Hero */}
       <div style={{ height: '100vh', position: 'relative', zIndex: 2 }}>
-        <MinimalHero />
+        <MinimalHero onEnrol={() => setPricingOpen(true)} />
       </div>
 
       {/* All sections */}
@@ -125,11 +129,11 @@ export default function DemoOne() {
         <FeaturesSection />
         <AgentsSection />
         <HowItWorks />
-        <CurriculumSection />
-        <AboutSection />
+        <CurriculumSection onEnrol={() => setPricingOpen(true)} />
+        <AboutSection onEnrol={() => setPricingOpen(true)} />
         <TestimonialsSection />
         <AffiliateSection />
-        <SiteFooter />
+        <SiteFooter onEnrol={() => setPricingOpen(true)} />
       </div>
 
     </div>

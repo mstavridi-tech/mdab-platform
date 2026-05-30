@@ -2,7 +2,7 @@
 import React from 'react';
 import { ShinyButton } from '@/components/ui/shiny-button';
 
-export default function AboutSection() {
+export default function AboutSection({ onEnrol }: { onEnrol?: () => void }) {
   return (
     <section style={{
       background: '#060608',
@@ -164,7 +164,7 @@ export default function AboutSection() {
 
           {/* CTA */}
           <div>
-            <ShinyButton>Learn from Tyron</ShinyButton>
+            <ShinyButton onClick={onEnrol}>Learn from Tyron</ShinyButton>
           </div>
 
         </div>

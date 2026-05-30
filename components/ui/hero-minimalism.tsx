@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { ShinyButton } from "@/components/ui/shiny-button";
 import { LoginModal } from "@/components/ui/login-modal";
 
-export default function MinimalHero() {
+export default function MinimalHero({ onEnrol }: { onEnrol?: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const gridCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [loginOpen, setLoginOpen] = React.useState(false);
@@ -630,7 +630,7 @@ export default function MinimalHero() {
         </nav>
         <div className="header-actions">
           <button className="btn-ghost" onClick={() => setLoginOpen(true)}>Log In</button>
-          <button className="btn-outline-gold">Enroll</button>
+          <button className="btn-outline-gold" onClick={onEnrol}>Enrol Now</button>
         </div>
         <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
       </header>
@@ -665,7 +665,7 @@ export default function MinimalHero() {
           <h1 className="title">Million Dollar<br/>Agent Blueprint</h1>
           <p className="subtitle">The exact system Tyron Ash used to build a<br/>9-figure international real estate empire.</p>
           <div className="hero-buttons">
-            <ShinyButton>Enroll Now — Join the Elite</ShinyButton>
+            <ShinyButton onClick={onEnrol}>Enrol Now — Join the Elite</ShinyButton>
             <button className="btn-secondary">See the Course</button>
           </div>
         </div>

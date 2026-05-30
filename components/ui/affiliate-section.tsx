@@ -12,17 +12,27 @@ export default function AffiliateSection() {
     }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <GlowCard>
-          <div style={{
-            padding: 'clamp(40px, 5vw, 64px) clamp(32px, 5vw, 64px)',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 40,
-            flexWrap: 'wrap',
-          }}>
+          <style suppressHydrationWarning>{`
+            .affiliate-inner {
+              padding: clamp(40px, 5vw, 64px) clamp(32px, 5vw, 64px);
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              justify-content: space-between;
+              gap: 24px;
+              flex-wrap: wrap;
+            }
+            @media (max-width: 768px) {
+              .affiliate-inner {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 20px !important;
+              }
+            }
+          `}</style>
+          <div className="affiliate-inner">
             {/* Left */}
-            <div style={{ flex: '1 1 340px', minWidth: 0 }}>
+            <div style={{ flex: '1 1 280px', minWidth: 0 }}>
               <p style={{
                 fontSize: 10,
                 letterSpacing: '0.32em',
@@ -49,7 +59,6 @@ export default function AffiliateSection() {
                 color: 'rgba(255,255,255,0.6)',
                 lineHeight: 1.75,
                 margin: 0,
-                maxWidth: 480,
               }}>
                 Our affiliate programme is powered by Skool. Refer an agent, earn a commission on every enrolment. No cap on earnings.
               </p>

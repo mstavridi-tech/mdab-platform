@@ -17,7 +17,7 @@ const MODULES = [
 const STICKY_TOP = 80; // navbar clearance
 const STACK_OFFSET = 10; // each card peeks this many px below the previous
 
-export default function CurriculumSection() {
+export default function CurriculumSection({ onEnrol }: { onEnrol?: () => void }) {
   return (
     <section style={{
       background: 'linear-gradient(180deg, #060608 0%, #1a1200 40%, #0e0900 100%)',
@@ -94,9 +94,10 @@ export default function CurriculumSection() {
           padding-left: 24px;
         }
         @media (max-width: 640px) {
-          .mod-row { padding: 20px clamp(16px, 5vw, 32px); }
+          .mod-row { padding: 18px 16px; }
           .mod-row-lessons { display: none; }
-          .mod-row-title { white-space: normal; }
+          .mod-row-title { white-space: normal; font-size: 15px; }
+          .mod-row-num { font-size: 11px; }
         }
       `}</style>
 
@@ -159,7 +160,7 @@ export default function CurriculumSection() {
 
       {/* CTA */}
       <div style={{ textAlign: 'center', marginTop: 64, padding: '0 clamp(20px, 5vw, 80px)' }}>
-        <ShinyButton>Get Instant Access</ShinyButton>
+        <ShinyButton onClick={onEnrol}>Get Instant Access</ShinyButton>
       </div>
 
     </section>

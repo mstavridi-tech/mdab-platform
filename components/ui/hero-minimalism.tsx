@@ -6,8 +6,158 @@ import { LoginModal } from "@/components/ui/login-modal";
 
 export default function MinimalHero() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const gridCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [loginOpen, setLoginOpen] = React.useState(false);
 
+  // Blueprint grid animation
+  useEffect(() => {
+    const canvas = gridCanvasRef.current!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const CELL = 52; // grid cell size
+    const GOLD = '201,168,76';
+
+    type Cell = { x: number; y: number; glow: number; glowDir: 1 | -1; active: boolean };
+
+    let cols = 0, rows = 0;
+    let cells: Cell[] = [];
+    let raf = 0;
+    let frame = 0;
+
+    // travelling light along grid edges
+    type Traveller = { col: number; row: number; dx: number; dy: number; progress: number; opacity: number };
+    let travellers: Traveller[] = [];
+
+    const setSize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      cols = Math.ceil(canvas.width / CELL) + 1;
+      rows = Math.ceil(canvas.height / CELL) + 1;
+      cells = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          cells.push({ x: c, y: r, glow: 0, glowDir: -1, active: false });
+        }
+      }
+    };
+    setSize();
+
+    const spawnTraveller = () => {
+      // pick a random edge point and direction
+      const horiz = Math.random() > 0.5;
+      travellers.push({
+        col: horiz ? 0 : Math.floor(Math.random() * cols),
+        row: horiz ? Math.floor(Math.random() * rows) : 0,
+        dx: horiz ? 1 : 0,
+        dy: horiz ? 0 : 1,
+        progress: 0,
+        opacity: 0.7 + Math.random() * 0.3,
+      });
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      frame++;
+
+      // Spawn travellers occasionally
+      if (frame % 90 === 0 && travellers.length < 6) spawnTraveller();
+      if (travellers.length === 0) spawnTraveller();
+
+      // Draw base grid lines — very faint
+      ctx.strokeStyle = `rgba(${GOLD}, 0.055)`;
+      ctx.lineWidth = 0.5;
+      for (let c = 0; c <= cols; c++) {
+        ctx.beginPath();
+        ctx.moveTo(c * CELL, 0);
+        ctx.lineTo(c * CELL, canvas.height);
+        ctx.stroke();
+      }
+      for (let r = 0; r <= rows; r++) {
+        ctx.beginPath();
+        ctx.moveTo(0, r * CELL);
+        ctx.lineTo(canvas.width, r * CELL);
+        ctx.stroke();
+      }
+
+      // Randomly activate cells to pulse softly
+      if (frame % 40 === 0) {
+        const idx = Math.floor(Math.random() * cells.length);
+        cells[idx].active = true;
+        cells[idx].glowDir = 1;
+      }
+
+      // Draw glowing cells
+      cells.forEach(cell => {
+        if (!cell.active && cell.glow <= 0) return;
+        cell.glow += cell.glowDir * 0.025;
+        if (cell.glow >= 1) cell.glowDir = -1;
+        if (cell.glow <= 0) { cell.glow = 0; cell.active = false; return; }
+
+        const px = cell.x * CELL;
+        const py = cell.y * CELL;
+        const alpha = cell.glow * 0.12;
+
+        ctx.fillStyle = `rgba(${GOLD}, ${alpha})`;
+        ctx.fillRect(px + 0.5, py + 0.5, CELL - 1, CELL - 1);
+
+        // border glow
+        ctx.strokeStyle = `rgba(${GOLD}, ${cell.glow * 0.35})`;
+        ctx.lineWidth = 0.8;
+        ctx.strokeRect(px + 0.5, py + 0.5, CELL - 1, CELL - 1);
+      });
+
+      // Draw travelling lights along grid lines
+      travellers = travellers.filter(t => {
+        t.progress += 0.018;
+        if (t.progress > cols + rows) return false;
+
+        const x = (t.col + t.dx * t.progress) * CELL;
+        const y = (t.row + t.dy * t.progress) * CELL;
+
+        if (x > canvas.width + CELL || y > canvas.height + CELL) return false;
+
+        // glow dot
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, 18);
+        grad.addColorStop(0, `rgba(${GOLD}, ${t.opacity})`);
+        grad.addColorStop(0.4, `rgba(${GOLD}, ${t.opacity * 0.3})`);
+        grad.addColorStop(1, `rgba(${GOLD}, 0)`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, 18, 0, Math.PI * 2);
+        ctx.fill();
+
+        // trailing line
+        const tailLen = 60;
+        const tx = x - t.dx * tailLen;
+        const ty = y - t.dy * tailLen;
+        const lineGrad = ctx.createLinearGradient(tx, ty, x, y);
+        lineGrad.addColorStop(0, `rgba(${GOLD}, 0)`);
+        lineGrad.addColorStop(1, `rgba(${GOLD}, ${t.opacity * 0.6})`);
+        ctx.strokeStyle = lineGrad;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        return true;
+      });
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    const onResize = () => { setSize(); };
+    window.addEventListener("resize", onResize);
+    draw();
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Particle dust animation
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d");
@@ -20,13 +170,9 @@ export default function MinimalHero() {
     setSize();
 
     type Particle = {
-      x: number;
-      y: number;
-      speed: number;
-      opacity: number;
-      fadeDelay: number;
-      fadeStart: number;
-      fadingOut: boolean;
+      x: number; y: number; speed: number;
+      opacity: number; fadeDelay: number;
+      fadeStart: number; fadingOut: boolean;
     };
 
     let particles: Particle[] = [];
@@ -78,11 +224,7 @@ export default function MinimalHero() {
       raf = requestAnimationFrame(draw);
     };
 
-    const onResize = () => {
-      setSize();
-      init();
-    };
-
+    const onResize = () => { setSize(); init(); };
     window.addEventListener("resize", onResize);
     init();
     raf = requestAnimationFrame(draw);
@@ -494,6 +636,16 @@ export default function MinimalHero() {
       </header>
 
       {/* Particles */}
+      {/* Blueprint grid */}
+      <canvas ref={gridCanvasRef} style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        opacity: 1,
+      }} />
+      {/* Particles */}
       <canvas ref={canvasRef} className="particleCanvas" />
 
       {/* Accent Lines (now animated on mount) */}
@@ -516,7 +668,6 @@ export default function MinimalHero() {
             <ShinyButton>Enroll Now — Join the Elite</ShinyButton>
             <button className="btn-secondary">See the Course</button>
           </div>
-          <p className="supporting">Strategy. Mindset. Execution. — Stop guessing. Start closing.<br/>The proven frameworks used by the world&apos;s top luxury agents.</p>
         </div>
       </main>
 

@@ -1,5 +1,5 @@
 'use client';
-import { findLesson } from '@/lib/courseData';
+import { COURSE, findLesson } from '@/lib/courseData';
 import ActivityCalendar from './ActivityCalendar';
 
 // Blanted-reference layout, warm gold. Cards are near-borderless glass:
@@ -48,6 +48,12 @@ export default function HomeView({ tier, firstName, pct, completed, activityByDa
 
   const isBp = tier === 'blueprint';
 
+  // first uncompleted lesson = where they left off
+  let nextLesson: { module: (typeof COURSE)[number]; lesson: (typeof COURSE)[number]['lessons'][number] } | null = null;
+  outer: for (const mod of COURSE) for (const l of mod.lessons) {
+    if (!completed.has(l.id)) { nextLesson = { module: mod, lesson: l }; break outer; }
+  }
+
   return (
     <div style={{ padding: '36px 40px 56px', display: 'grid', gridTemplateColumns: '1.85fr 1fr', gap: 28, alignItems: 'start' }}>
 
@@ -58,9 +64,9 @@ export default function HomeView({ tier, firstName, pct, completed, activityByDa
         <div style={{ padding: '8px 6px 0' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start' }}>
             <div>
-              <p style={h.label}>{isBp ? 'Total Progress' : `Welcome back, ${firstName}`}</p>
+              <p style={h.label}>{isBp ? 'Total Progress' : 'Welcome back'}</p>
               <p style={{ fontSize: 48, fontWeight: 800, color: '#fff', margin: '8px 0 10px', letterSpacing: '-0.045em', lineHeight: 1 }}>
-                {isBp ? `${pct}%` : 'Community'}
+                {isBp ? `${pct}%` : firstName}
               </p>
               <p style={{ fontSize: 13.5, color: 'rgba(255,240,210,0.45)', margin: 0 }}>
                 {isBp
@@ -97,6 +103,24 @@ export default function HomeView({ tier, firstName, pct, completed, activityByDa
             })}
           </div>
         </div>
+
+        {/* Continue where you left off */}
+        {isBp && nextLesson && (
+          <div style={{ ...glass, padding: '20px 26px', display: 'flex', alignItems: 'center', gap: 18 }}>
+            <div style={{ width: 46, height: 46, borderRadius: 14, flexShrink: 0, background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 0, height: 0, borderTop: '8px solid transparent', borderBottom: '8px solid transparent', borderLeft: `12px solid ${GL}`, marginLeft: 3 }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 12, color: 'rgba(255,240,210,0.45)', margin: '0 0 3px' }}>Pick up where you left off</p>
+              <p style={{ fontSize: 15, fontWeight: 800, color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                Module {nextLesson.module.id} · {nextLesson.lesson.title}
+              </p>
+            </div>
+            <button onClick={onStartCourse} style={{ flexShrink: 0, padding: '12px 22px', borderRadius: 12, border: 'none', background: `linear-gradient(135deg, ${GL}, ${G})`, color: '#0a0800', fontSize: 11.5, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '0 8px 28px rgba(201,168,76,0.4)' }}>
+              Resume →
+            </button>
+          </div>
+        )}
 
         {/* Donut card */}
         <div style={{ ...glass, padding: '34px 38px', display: 'flex', alignItems: 'center', gap: 40, position: 'relative', overflow: 'hidden' }}>
@@ -156,11 +180,7 @@ export default function HomeView({ tier, firstName, pct, completed, activityByDa
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: 0, letterSpacing: '0.14em' }}>{firstName.toUpperCase()} · MEMBER</p>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 14 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
-          </div>
+
         </div>
 
         {/* Recent activity */}

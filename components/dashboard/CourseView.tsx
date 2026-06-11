@@ -11,8 +11,13 @@ interface Props {
 }
 
 export default function CourseView({ completed, markComplete, markIncomplete, pct }: Props) {
-  const [activeLessonId, setActiveLessonId] = useState(COURSE[0].lessons[0].id);
-  const [openModule, setOpenModule] = useState(COURSE[0].id);
+  // open at the first uncompleted lesson — "resume where you left off"
+  const firstUnfinished = (() => {
+    for (const mod of COURSE) for (const l of mod.lessons) if (!completed.has(l.id)) return { mod: mod.id, les: l.id };
+    return { mod: COURSE[0].id, les: COURSE[0].lessons[0].id };
+  })();
+  const [activeLessonId, setActiveLessonId] = useState(firstUnfinished.les);
+  const [openModule, setOpenModule] = useState(firstUnfinished.mod);
 
   const current = findLesson(activeLessonId)!;
   const isDone = completed.has(activeLessonId);

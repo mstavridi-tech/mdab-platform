@@ -12,23 +12,41 @@ import AgentsSection from "@/components/ui/agents-section";
 import SiteFooter from "@/components/ui/site-footer";
 import ScrollText from "@/components/ui/scroll-text";
 import { PricingModal } from "@/components/ui/pricing-modal";
+import SignupModal from "@/components/ui/signup-modal";
 import CheckoutModal, { Plan } from "@/components/ui/checkout-modal";
 
 export default function DemoOne() {
   const glowRef = useRef<HTMLDivElement>(null);
+
+  // Modal flow: pricing → signup → checkout
   const [pricingOpen, setPricingOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
+  // Step 1: user picks a plan
   function handleSelectPlan(plan: Plan) {
     setPricingOpen(false);
     setSelectedPlan(plan);
+    setSignupOpen(true);
+  }
+
+  // Step 2: account created — move to checkout
+  function handleSignupSuccess() {
+    setSignupOpen(false);
     setCheckoutOpen(true);
   }
 
-  function handleBackToPricing() {
-    setCheckoutOpen(false);
+  // Back from signup → pricing
+  function handleSignupBack() {
+    setSignupOpen(false);
     setPricingOpen(true);
+  }
+
+  // Back from checkout → signup
+  function handleCheckoutBack() {
+    setCheckoutOpen(false);
+    setSignupOpen(true);
   }
 
   // Mouse-following gold glow
@@ -61,19 +79,14 @@ export default function DemoOne() {
     };
   }, []);
 
-  // Aggressive fade-in — targets everything meaningful
+  // Scroll fade-in
   useEffect(() => {
-    const SELECTORS = [
-      '.fade-in',
-      '.hiw-card',
-      '.mod-card',
-    ].join(', ');
-
+    const SELECTORS = ['.fade-in', '.hiw-card', '.mod-card'].join(', ');
     const els = document.querySelectorAll(SELECTORS);
     const seen = new Set<Element>();
 
     const obs = new IntersectionObserver(
-      entries => entries.forEach((e, idx) => {
+      entries => entries.forEach((e) => {
         if (e.isIntersecting && !seen.has(e.target)) {
           seen.add(e.target);
           const el = e.target as HTMLElement;
@@ -92,12 +105,8 @@ export default function DemoOne() {
     els.forEach((el, i) => {
       if (seen.has(el)) return;
       const h = el as HTMLElement;
-      // skip elements that are above the fold already
       const rect = h.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.9) {
-        seen.add(el);
-        return;
-      }
+      if (rect.top < window.innerHeight * 0.9) { seen.add(el); return; }
       h.style.opacity = '0';
       h.style.transform = 'translateY(52px) scale(0.98)';
       h.style.filter = 'blur(8px)';
@@ -109,6 +118,8 @@ export default function DemoOne() {
     return () => obs.disconnect();
   }, []);
 
+  const openPricing = () => setPricingOpen(true);
+
   return (
     <div style={{ background: '#060608', minHeight: '100vh', position: 'relative', overflowX: 'clip' }}>
 
@@ -116,34 +127,36 @@ export default function DemoOne() {
       <div
         ref={glowRef}
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: 800,
-          height: 800,
-          borderRadius: '50%',
+          position: 'absolute', top: 0, left: 0,
+          width: 800, height: 800, borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(201,168,76,0.07) 0%, rgba(201,168,76,0.03) 40%, transparent 70%)',
-          pointerEvents: 'none',
-          zIndex: 1,
-          willChange: 'transform',
+          pointerEvents: 'none', zIndex: 1, willChange: 'transform',
         }}
       />
 
+      {/* Modal flow */}
       <PricingModal
         isOpen={pricingOpen}
         onClose={() => setPricingOpen(false)}
         onSelectPlan={handleSelectPlan}
       />
+      <SignupModal
+        isOpen={signupOpen}
+        plan={selectedPlan}
+        onClose={() => setSignupOpen(false)}
+        onBack={handleSignupBack}
+        onSuccess={handleSignupSuccess}
+      />
       <CheckoutModal
         isOpen={checkoutOpen}
         plan={selectedPlan}
         onClose={() => setCheckoutOpen(false)}
-        onBack={handleBackToPricing}
+        onBack={handleCheckoutBack}
       />
 
       {/* Hero */}
       <div style={{ height: '100vh', position: 'relative', zIndex: 2 }}>
-        <MinimalHero onEnrol={() => setPricingOpen(true)} />
+        <MinimalHero onEnrol={openPricing} />
       </div>
 
       {/* All sections */}
@@ -152,12 +165,12 @@ export default function DemoOne() {
         <ScrollText />
         <FeaturesSection />
         <AgentsSection />
-        <HowItWorks onEnrol={() => setPricingOpen(true)} />
-        <CurriculumSection onEnrol={() => setPricingOpen(true)} />
-        <AboutSection onEnrol={() => setPricingOpen(true)} />
+        <HowItWorks onEnrol={openPricing} />
+        <CurriculumSection onEnrol={openPricing} />
+        <AboutSection onEnrol={openPricing} />
         <TestimonialsSection />
         <AffiliateSection />
-        <SiteFooter onEnrol={() => setPricingOpen(true)} />
+        <SiteFooter onEnrol={openPricing} />
       </div>
 
     </div>

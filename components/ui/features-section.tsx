@@ -99,7 +99,7 @@ function GridPattern({ id }: { id: string }) {
 function FeatureCard({ title, description, icon: Icon, index }: {
   title: string;
   description: string;
-  icon: () => JSX.Element;
+  icon: () => React.JSX.Element;
   index: number;
 }) {
   const patternId = `grid-${index}`;

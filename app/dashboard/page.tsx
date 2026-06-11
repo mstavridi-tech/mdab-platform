@@ -3,6 +3,10 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
+import { useProgress } from '@/lib/useProgress';
+import CourseView from '@/components/dashboard/CourseView';
+import ActivityCalendar from '@/components/dashboard/ActivityCalendar';
+import { LiveView, ModulesView, ResourcesView, NetworkView, AffiliateView, AccountView, LockedView } from '@/components/dashboard/SectionViews';
 
 interface Profile {
   full_name: string | null;
@@ -293,7 +297,15 @@ function Donut({ pct, size = 110, stroke = 9 }: { pct: number; size?: number; st
 }
 
 // ── BLUEPRINT VIEW ────────────────────────────────────────────────────────────
-function BlueprintView({ firstName, user }: { firstName: string; user: User }) {
+function BlueprintView({ firstName, user, pct, completedCount, activityByDay, onStartCourse }: { firstName: string; user: User; pct: number; completedCount: number; activityByDay: Map<string, number>; onStartCourse: () => void }) {
+  void firstName; void user;
+  const last7 = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return { label: d.toLocaleDateString('en', { weekday: 'short' }), count: activityByDay.get(key) ?? 0 };
+  });
+  const weekTotal = last7.reduce((s, d) => s + d.count, 0);
+  const weekMax = Math.max(1, ...last7.map(d => d.count));
   return (
     <div style={{ padding: '28px 28px 48px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
@@ -319,10 +331,10 @@ function BlueprintView({ firstName, user }: { firstName: string; user: User }) {
         <div style={{ padding: '22px 28px', borderRadius: 20, background: 'rgba(255,248,230,0.028)', border: '1px solid rgba(255,215,120,0.065)', display: 'flex', alignItems: 'center', gap: 28 }}>
           <div>
             <p style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,230,170,0.32)', fontWeight: 600, margin: '0 0 4px' }}>Your Progress</p>
-            <p style={{ fontSize: 34, fontWeight: 900, color: '#fafafa', margin: '0 0 4px', letterSpacing: '-0.04em', lineHeight: 1 }}>0%</p>
-            <p style={{ fontSize: 12, color: 'rgba(201,168,76,0.7)', margin: '0 0 18px', fontWeight: 600 }}>Start Module 01 to begin</p>
+            <p style={{ fontSize: 34, fontWeight: 900, color: '#fafafa', margin: '0 0 4px', letterSpacing: '-0.04em', lineHeight: 1 }}>{pct}%</p>
+            <p style={{ fontSize: 12, color: 'rgba(201,168,76,0.7)', margin: '0 0 18px', fontWeight: 600 }}>{completedCount > 0 ? `${completedCount} of 38 lessons completed` : 'Start Module 01 to begin'}</p>
             <div style={{ display: 'flex', gap: 20 }}>
-              {[{ v: '0', l: 'Completed' }, { v: '38', l: 'Total lessons' }].map(s => (
+              {[{ v: String(completedCount), l: 'Completed' }, { v: '38', l: 'Total lessons' }].map(s => (
                 <div key={s.l}>
                   <p style={{ fontSize: 18, fontWeight: 900, color: '#fafafa', margin: '0 0 2px', letterSpacing: '-0.02em' }}>{s.v}</p>
                   <p style={{ fontSize: 9, color: 'rgba(255,220,140,0.26)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{s.l}</p>
@@ -331,9 +343,9 @@ function BlueprintView({ firstName, user }: { firstName: string; user: User }) {
             </div>
           </div>
           <div style={{ flexShrink: 0, position: 'relative' }}>
-            <Donut pct={0} size={130} stroke={10} />
+            <Donut pct={pct} size={130} stroke={10} />
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 11, color: 'rgba(255,220,140,0.22)', letterSpacing: '0.1em' }}>START</span>
+              <span style={{ fontSize: pct > 0 ? 18 : 11, fontWeight: pct > 0 ? 900 : 400, color: pct > 0 ? '#E2C472' : 'rgba(255,220,140,0.22)', letterSpacing: pct > 0 ? '-0.02em' : '0.1em' }}>{pct > 0 ? `${pct}%` : 'START'}</span>
             </div>
           </div>
         </div>
@@ -345,7 +357,7 @@ function BlueprintView({ firstName, user }: { firstName: string; user: User }) {
           <p style={{ fontSize: 13, fontWeight: 700, color: '#fafafa', margin: '0 0 14px' }}>Module 01</p>
           <p style={{ fontSize: 14, fontWeight: 800, color: '#fafafa', margin: '0 0 6px', lineHeight: 1.3 }}>The Million Dollar Agent Mindset</p>
           <p style={{ fontSize: 11, color: 'rgba(255,230,170,0.3)', margin: '0 0 16px' }}>2 lessons · ~30 min</p>
-          <button style={{ width: '100%', padding: '11px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #E2C472, #C9A84C)', color: '#0a0800', fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '0 4px 16px rgba(201,168,76,0.35)' }}>
+          <button onClick={onStartCourse} style={{ width: '100%', padding: '11px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #E2C472, #C9A84C)', color: '#0a0800', fontSize: 11, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '0 4px 16px rgba(201,168,76,0.35)' }}>
             Start →
           </button>
           {/* Mini line */}
@@ -363,7 +375,7 @@ function BlueprintView({ firstName, user }: { firstName: string; user: User }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div>
               <p style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,230,170,0.32)', fontWeight: 600, margin: '0 0 2px' }}>Learning Activity</p>
-              <p style={{ fontSize: 15, fontWeight: 800, color: '#fafafa', margin: 0 }}>No activity yet</p>
+              <p style={{ fontSize: 15, fontWeight: 800, color: '#fafafa', margin: 0 }}>{weekTotal > 0 ? `${weekTotal} lesson${weekTotal === 1 ? '' : 's'} this week` : 'No activity yet'}</p>
             </div>
             <span style={{ fontSize: 11, color: 'rgba(255,220,140,0.22)', padding: '4px 10px', borderRadius: 8, border: '1px solid rgba(255,215,120,0.045)' }}>This week</span>
           </div>
@@ -374,22 +386,24 @@ function BlueprintView({ firstName, user }: { firstName: string; user: User }) {
             {[0, 25, 50, 75, 100].map(pct => (
               <div key={pct} style={{ position: 'absolute', left: 0, right: 0, bottom: `${pct}%`, height: 1, background: 'rgba(255,215,120,0.05)' }} />
             ))}
-            {/* Ghost bars */}
+            {/* Bars — real lesson activity, last 7 days */}
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', gap: 8, padding: '0 4px' }}>
-              {[0, 0, 0, 0, 0, 0, 0].map((_, i) => (
-                <div key={i} style={{ flex: 1, height: 4, borderRadius: '3px 3px 0 0', background: 'rgba(255,215,120,0.05)' }} />
+              {last7.map((d, i) => (
+                <div key={i} title={d.count ? `${d.count} lesson${d.count === 1 ? '' : 's'}` : undefined} style={{ flex: 1, height: d.count ? `${Math.round((d.count / weekMax) * 100)}%` : 4, borderRadius: '3px 3px 0 0', background: d.count ? 'linear-gradient(180deg, #E2C472, rgba(201,168,76,0.25))' : 'rgba(255,215,120,0.05)', boxShadow: d.count ? '0 0 14px rgba(201,168,76,0.25)' : 'none', transition: 'height 500ms ease' }} />
               ))}
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
-              <span key={d} style={{ fontSize: 9, color: 'rgba(255,220,140,0.22)' }}>{d}</span>
+            {last7.map((d, i) => (
+              <span key={i} style={{ fontSize: 9, color: 'rgba(255,220,140,0.22)' }}>{d.label}</span>
             ))}
           </div>
 
-          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(255,215,120,0.05)', textAlign: 'center' }}>
-            <p style={{ fontSize: 12, color: 'rgba(255,230,170,0.26)', margin: 0 }}>Start Module 01 to track your learning here.</p>
-          </div>
+          {weekTotal === 0 && (
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(255,215,120,0.05)', textAlign: 'center' }}>
+              <p style={{ fontSize: 12, color: 'rgba(255,230,170,0.26)', margin: 0 }}>Start Module 01 to track your learning here.</p>
+            </div>
+          )}
         </div>
 
         {/* Module list */}
@@ -405,6 +419,7 @@ function BlueprintView({ firstName, user }: { firstName: string; user: User }) {
                 background: 'rgba(255,248,230,0.022)', border: '1px solid rgba(255,215,120,0.045)',
                 cursor: 'pointer', transition: 'all 150ms',
               }}
+              onClick={onStartCourse}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(201,168,76,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,168,76,0.22)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,248,230,0.022)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,215,120,0.045)'; }}
               >
@@ -444,16 +459,8 @@ function BlueprintView({ firstName, user }: { firstName: string; user: User }) {
           </div>
         </div>
 
-        {/* Affiliate */}
-        <div style={{ padding: '22px 22px', borderRadius: 20, background: 'rgba(255,248,230,0.028)', border: '1px solid rgba(255,215,120,0.065)' }}>
-          <p style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,230,170,0.32)', fontWeight: 600, margin: '0 0 16px' }}>Affiliate Programme</p>
-          <p style={{ fontSize: 40, fontWeight: 900, color: '#fafafa', margin: '0 0 4px', letterSpacing: '-0.04em', lineHeight: 1 }}>$0</p>
-          <p style={{ fontSize: 12, color: 'rgba(255,220,140,0.26)', margin: '0 0 18px' }}>Earned so far · 0 referrals</p>
-          <p style={{ fontSize: 12, color: 'rgba(255,230,170,0.36)', margin: '0 0 16px', lineHeight: 1.5 }}>Earn 20% commission on every Blueprint referral. Get your link and start sharing.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <a href="#" style={{ display: 'block', textAlign: 'center', padding: '10px', borderRadius: 10, border: '1px solid rgba(134,239,172,0.25)', color: 'rgba(134,239,172,0.8)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}>Get My Affiliate Link →</a>
-          </div>
-        </div>
+        {/* Activity calendar — combo month grid + heatmap */}
+        <ActivityCalendar activityByDay={activityByDay} />
       </div>
 
     </div>
@@ -548,6 +555,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [activeNav, setActiveNav] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const progress = useProgress(user?.id);
 
   useEffect(() => {
     async function init() {
@@ -614,10 +622,39 @@ export default function DashboardPage() {
         <TopBar firstName={firstName} profile={profile} activeNav={activeNav} view={view} />
 
         {/* Scrollable content */}
-        <div style={{ flex: 1, overflowY: 'auto', animation: 'fadeIn 0.4s ease both' }}>
-          {view === 'pending'   && <PendingView firstName={firstName} />}
-          {view === 'blueprint' && <BlueprintView firstName={firstName} user={user!} />}
-          {view === 'community' && <CommunityView firstName={firstName} user={user!} />}
+        <div key={activeNav} style={{ flex: 1, overflowY: 'auto', animation: 'fadeIn 0.4s ease both' }}>
+          {progress.tableMissing && view === 'blueprint' && (
+            <div style={{ margin: '16px 28px 0', padding: '12px 16px', borderRadius: 12, background: 'rgba(252,165,165,0.07)', border: '1px solid rgba(252,165,165,0.25)', color: 'rgba(252,165,165,0.8)', fontSize: 12 }}>
+              Progress isn&apos;t saving yet — run <code>supabase/lesson_progress.sql</code> in your Supabase SQL Editor (one time setup).
+            </div>
+          )}
+          {view === 'pending' ? (
+            activeNav === 'account'
+              ? <AccountView fullName={profile?.full_name ?? firstName} email={user?.email ?? ''} planLabel="Pending" onSignOut={handleSignOut} />
+              : <PendingView firstName={firstName} />
+          ) : activeNav === 'live' ? (
+            <LiveView />
+          ) : activeNav === 'course' ? (
+            view === 'blueprint'
+              ? <CourseView completed={progress.completed} markComplete={progress.markComplete} markIncomplete={progress.markIncomplete} pct={progress.pct} />
+              : <LockedView sectionName="The course" />
+          ) : activeNav === 'modules' ? (
+            view === 'blueprint'
+              ? <ModulesView completed={progress.completed} onOpenCourse={() => setActiveNav('course')} />
+              : <LockedView sectionName="Modules" />
+          ) : activeNav === 'resources' ? (
+            view === 'blueprint' ? <ResourcesView /> : <LockedView sectionName="Resources" />
+          ) : activeNav === 'network' ? (
+            <NetworkView />
+          ) : activeNav === 'affiliate' ? (
+            <AffiliateView userEmail={user?.email ?? 'member'} />
+          ) : activeNav === 'account' ? (
+            <AccountView fullName={profile?.full_name ?? firstName} email={user?.email ?? ''} planLabel={view === 'blueprint' ? 'Blueprint' : 'Community'} onSignOut={handleSignOut} />
+          ) : view === 'blueprint' ? (
+            <BlueprintView firstName={firstName} user={user!} pct={progress.pct} completedCount={progress.completed.size} activityByDay={progress.activityByDay} onStartCourse={() => setActiveNav('course')} />
+          ) : (
+            <CommunityView firstName={firstName} user={user!} />
+          )}
         </div>
       </div>
     </div>

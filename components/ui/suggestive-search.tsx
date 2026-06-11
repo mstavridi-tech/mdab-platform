@@ -37,7 +37,7 @@ export const TypewriterEffect: React.FC<EffectRendererProps> = ({
   cursorColor = 'rgba(201,168,76,0.6)',
 }) => {
   const [phase, setPhase] = useState<'typing' | 'paused' | 'deleting'>('typing');
-  const timers = useRef<ReturnType<typeof window.setTimeout>[]>([]);
+  const timers = useRef<number[]>([]);
 
   useEffect(() => {
     setPhase('typing');

@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import { useProgress } from '@/lib/useProgress';
 import CourseView from '@/components/dashboard/CourseView';
+import HomeView from '@/components/dashboard/HomeView';
 import ActivityCalendar from '@/components/dashboard/ActivityCalendar';
 import { LiveView, ModulesView, ResourcesView, NetworkView, AffiliateView, AccountView, LockedView, MaterialsView } from '@/components/dashboard/SectionViews';
 
@@ -670,10 +671,8 @@ export default function DashboardPage() {
             <AffiliateView userEmail={user?.email ?? 'member'} />
           ) : activeNav === 'account' ? (
             <AccountView fullName={profile?.full_name ?? firstName} email={user?.email ?? ''} planLabel={view === 'blueprint' ? 'Blueprint' : 'Community'} onSignOut={handleSignOut} />
-          ) : view === 'blueprint' ? (
-            <BlueprintView firstName={firstName} user={user!} pct={progress.pct} completedCount={progress.completed.size} activityByDay={progress.activityByDay} onStartCourse={() => setActiveNav('course')} />
           ) : (
-            <CommunityView firstName={firstName} user={user!} activityByDay={progress.activityByDay} onOpenMaterials={() => setActiveNav('materials')} />
+            <HomeView tier={view} firstName={firstName} pct={progress.pct} completed={progress.completed} activityByDay={progress.activityByDay} onStartCourse={() => setActiveNav('course')} onOpenMaterials={() => setActiveNav('materials')} />
           )}
         </div>
       </div>

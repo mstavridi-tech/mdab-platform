@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, X } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 type LoginTier = null | 'community' | 'blueprint';
 
@@ -38,11 +39,10 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     if (!email || !password) { setError("Please enter your email and password."); return; }
     setIsLoading(true);
     try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const sb = createClient('https://fwvirmydpvescaahauee.supabase.co', 'sb_publishable_lWCePWFplzqqs9Mtql9WnA_i2TMVwJq');
-      const { error: authError } = await sb.auth.signInWithPassword({ email, password });
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) { setError("Incorrect email or password. Try again."); setIsLoading(false); return; }
       onClose();
+      window.location.href = "/dashboard";
     } catch { setError("Something went wrong. Please try again."); }
     setIsLoading(false);
   };
@@ -54,9 +54,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setResetLoading(true);
     setError("");
     try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const sb = createClient('https://fwvirmydpvescaahauee.supabase.co', 'sb_publishable_lWCePWFplzqqs9Mtql9WnA_i2TMVwJq');
-      await sb.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+      await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
       setResetSent(true);
       setError("");
     } catch { setError("Something went wrong. Please try again."); }

@@ -217,3 +217,53 @@ export function LockedView({ sectionName }: { sectionName: string }) {
     </div>
   );
 }
+
+
+// ── LEARNING MATERIALS (webinar library — community + blueprint) ──────────────
+const WEBINARS = [
+  { title: 'Breaking Into Luxury Listings', date: 'May 2026', duration: '58 min', topic: 'Listings', videoUrl: '' },
+  { title: 'The Follow-Up System That Closed 12 Deals', date: 'May 2026', duration: '47 min', topic: 'Prospecting', videoUrl: '' },
+  { title: 'Objection Clinic: Live Role-Plays', date: 'April 2026', duration: '62 min', topic: 'Closing', videoUrl: '' },
+  { title: 'Instagram for Agents: What Works Now', date: 'April 2026', duration: '51 min', topic: 'Brand', videoUrl: '' },
+  { title: 'Off-Plan Q&A with Tyron', date: 'March 2026', duration: '55 min', topic: 'Off-Plan', videoUrl: '' },
+  { title: 'Your First 90 Days in Dubai Real Estate', date: 'March 2026', duration: '49 min', topic: 'Mindset', videoUrl: '' },
+];
+
+export function MaterialsView() {
+  return (
+    <div style={wrap}>
+      <div style={{ ...card, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
+        <div>
+          <p style={label}>Webinar Library</p>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: T.text, margin: 0, letterSpacing: '-0.02em' }}>Past live trainings, on demand.</h2>
+        </div>
+        <p style={{ fontSize: 12, color: T.dim, margin: 0, maxWidth: 320, lineHeight: 1.5 }}>Every live call is uploaded here within 24 hours. New sessions every Monday.</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: 14 }}>
+        {WEBINARS.map(w => (
+          <div key={w.title} style={{ ...card, padding: 0, overflow: 'hidden', cursor: 'pointer', transition: 'border-color 150ms, transform 150ms' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,168,76,0.35)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,215,120,0.08)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
+          >
+            <div style={{ position: 'relative', paddingTop: '52%', background: 'radial-gradient(ellipse at 30% 25%, rgba(201,168,76,0.14), rgba(10,8,2,0.9) 75%)' }}>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(201,168,76,0.14)', border: '1px solid rgba(201,168,76,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 24px rgba(201,168,76,0.25)' }}>
+                  <div style={{ width: 0, height: 0, borderTop: '8px solid transparent', borderBottom: '8px solid transparent', borderLeft: `13px solid ${T.goldLight}`, marginLeft: 4 }} />
+                </div>
+              </div>
+              <span style={{ position: 'absolute', bottom: 10, right: 12, fontSize: 10, fontWeight: 700, color: 'rgba(255,240,200,0.7)', background: 'rgba(0,0,0,0.55)', padding: '3px 8px', borderRadius: 6 }}>{w.duration}</span>
+            </div>
+            <div style={{ padding: '16px 18px 18px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: 9, padding: '3px 9px', borderRadius: 6, background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.22)', color: T.goldLight, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{w.topic}</span>
+                <span style={{ fontSize: 10, color: T.faint }}>{w.date}</span>
+              </div>
+              <p style={{ fontSize: 14.5, fontWeight: 800, color: T.text, margin: 0, lineHeight: 1.35 }}>{w.title}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

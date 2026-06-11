@@ -6,7 +6,7 @@ import type { User } from '@supabase/supabase-js';
 import { useProgress } from '@/lib/useProgress';
 import CourseView from '@/components/dashboard/CourseView';
 import ActivityCalendar from '@/components/dashboard/ActivityCalendar';
-import { LiveView, ModulesView, ResourcesView, NetworkView, AffiliateView, AccountView, LockedView } from '@/components/dashboard/SectionViews';
+import { LiveView, ModulesView, ResourcesView, NetworkView, AffiliateView, AccountView, LockedView, MaterialsView } from '@/components/dashboard/SectionViews';
 
 interface Profile {
   full_name: string | null;
@@ -47,6 +47,7 @@ const NAV = [
     { id: 'course', label: 'Course', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg> },
     { id: 'modules', label: 'Modules', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg> },
     { id: 'resources', label: 'Resources', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg> },
+    { id: 'materials', label: 'Learning Materials', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="10,8 16,12 10,16 10,8"/></svg> },
   ]},
   { section: 'COMMUNITY', items: [
     { id: 'network', label: 'Network', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg> },
@@ -113,7 +114,7 @@ function Sidebar({ active, onNav, onSignOut, expanded, setExpanded, profile }: {
                     display: 'flex', alignItems: 'center', gap: 12,
                     width: '100%', padding: '9px 0', paddingLeft: 15,
                     border: 'none', cursor: 'pointer', textAlign: 'left',
-                    background: isActive ? 'rgba(201,168,76,0.1)' : 'transparent',
+                    background: isActive ? 'linear-gradient(90deg, rgba(201,168,76,0.17), rgba(201,168,76,0.02))' : 'transparent',
                     borderLeft: isActive ? '2px solid #C9A84C' : '2px solid transparent',
                     color: isActive ? '#E2C472' : 'rgba(255,240,200,0.38)',
                     transition: 'all 150ms',
@@ -170,7 +171,7 @@ function Sidebar({ active, onNav, onSignOut, expanded, setExpanded, profile }: {
 function TopBar({ firstName, profile, activeNav, view }: { firstName: string; profile: Profile | null; activeNav: string; view: 'pending' | 'community' | 'blueprint' }) {
   const pageTitle: Record<string, string> = {
     dashboard: 'Dashboard', live: 'Live Training', course: 'Course',
-    modules: 'Modules', resources: 'Resources', network: 'Network',
+    modules: 'Modules', resources: 'Resources', materials: 'Learning Materials', network: 'Network',
     affiliate: 'Affiliate', account: 'Account',
   };
   const [now, setNow] = useState(new Date());
@@ -468,7 +469,7 @@ function BlueprintView({ firstName, user, pct, completedCount, activityByDay, on
 }
 
 // ── COMMUNITY VIEW ────────────────────────────────────────────────────────────
-function CommunityView({ firstName, user }: { firstName: string; user: User }) {
+function CommunityView({ firstName, user, activityByDay, onOpenMaterials }: { firstName: string; user: User; activityByDay: Map<string, number>; onOpenMaterials: () => void }) {
   return (
     <div style={{ padding: '28px 28px 48px', display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Top row */}
@@ -530,6 +531,19 @@ function CommunityView({ firstName, user }: { firstName: string; user: User }) {
             <p style={{ fontSize: 11, color: 'rgba(255,220,140,0.26)', margin: '0 0 12px' }}>Earn 20% per Blueprint referral</p>
             <a href="#" style={{ display: 'block', textAlign: 'center', padding: '9px', borderRadius: 10, border: '1px solid rgba(134,239,172,0.2)', color: 'rgba(134,239,172,0.7)', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}>Get My Link →</a>
           </div>
+        </div>
+      </div>
+
+      {/* Activity calendar + Learning materials shortcut */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 14 }}>
+        <ActivityCalendar activityByDay={activityByDay} />
+        <div style={{ padding: '24px 26px', borderRadius: 20, background: 'rgba(255,248,230,0.028)', border: '1px solid rgba(255,215,120,0.065)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <p style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(201,168,76,0.7)', fontWeight: 600, margin: '0 0 8px' }}>Learning Materials</p>
+          <h3 style={{ fontSize: 19, fontWeight: 900, color: '#fafafa', margin: '0 0 8px', letterSpacing: '-0.02em' }}>The webinar library is yours.</h3>
+          <p style={{ fontSize: 13, color: 'rgba(255,230,170,0.36)', margin: '0 0 18px', lineHeight: 1.6 }}>Every past live training, recorded and on demand. New sessions added after every Monday call.</p>
+          <button onClick={onOpenMaterials} style={{ alignSelf: 'flex-start', padding: '12px 22px', borderRadius: 11, border: 'none', background: 'linear-gradient(135deg, #E2C472, #C9A84C)', color: '#0a0800', fontSize: 11, fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '0 6px 22px rgba(201,168,76,0.4)' }}>
+            Browse Webinars →
+          </button>
         </div>
       </div>
 
@@ -603,6 +617,10 @@ export default function DashboardPage() {
         {/* Warm amber gradient blobs — dialled back */}
         <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '52%', height: '60%', background: 'radial-gradient(ellipse, rgba(215,150,45,0.14) 0%, rgba(201,168,76,0.04) 50%, transparent 72%)', borderRadius: '50%' }} />
         <div style={{ position: 'absolute', bottom: '-15%', left: '5%', width: '40%', height: '50%', background: 'radial-gradient(ellipse, rgba(210,145,40,0.09) 0%, transparent 65%)', borderRadius: '50%' }} />
+        {/* Futuristic touches: hairline gold beam + diagonal sheen */}
+        <div style={{ position: 'absolute', top: 0, left: '18%', width: '64%', height: 1, background: 'linear-gradient(90deg, transparent, rgba(226,196,114,0.4), transparent)' }} />
+        <div style={{ position: 'absolute', top: '14%', left: '-12%', width: '58%', height: '44%', background: 'radial-gradient(ellipse, rgba(201,168,76,0.05) 0%, transparent 65%)', transform: 'rotate(-14deg)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 120%, transparent 55%, rgba(0,0,0,0.5))' }} />
         {/* Subtle grid */}
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(201,168,76,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.022) 1px, transparent 1px)', backgroundSize: '64px 64px', opacity: 0.55 }} />
       </div>
@@ -644,6 +662,8 @@ export default function DashboardPage() {
               : <LockedView sectionName="Modules" />
           ) : activeNav === 'resources' ? (
             view === 'blueprint' ? <ResourcesView /> : <LockedView sectionName="Resources" />
+          ) : activeNav === 'materials' ? (
+            <MaterialsView />
           ) : activeNav === 'network' ? (
             <NetworkView />
           ) : activeNav === 'affiliate' ? (
@@ -653,7 +673,7 @@ export default function DashboardPage() {
           ) : view === 'blueprint' ? (
             <BlueprintView firstName={firstName} user={user!} pct={progress.pct} completedCount={progress.completed.size} activityByDay={progress.activityByDay} onStartCourse={() => setActiveNav('course')} />
           ) : (
-            <CommunityView firstName={firstName} user={user!} />
+            <CommunityView firstName={firstName} user={user!} activityByDay={progress.activityByDay} onOpenMaterials={() => setActiveNav('materials')} />
           )}
         </div>
       </div>
